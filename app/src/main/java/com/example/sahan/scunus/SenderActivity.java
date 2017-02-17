@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.EditText;
 
+import com.example.sahan.scunus.Sensors.AccelerometerSensorActivity;
+import com.example.sahan.scunus.Sensors.ProximitySensorActivity;
+
 
 public class SenderActivity extends AppCompatActivity {
 

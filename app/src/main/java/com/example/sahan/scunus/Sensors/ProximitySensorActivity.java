@@ -1,4 +1,4 @@
-package com.example.sahan.scunus;
+package com.example.sahan.scunus.Sensors;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -7,24 +7,24 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 
-public class AccelerometerSensorActivity implements SensorEventListener {
+public class ProximitySensorActivity implements SensorEventListener {
+
     private Context context;
     private SensorManager mSensorManager;
-    private Sensor mAccelerometer;
+    private Sensor mProximity;
     private ISensorListener sensorListener;
 
-    AccelerometerSensorActivity(Context context) {
+    public ProximitySensorActivity(Context context) {
         this.context = context;
         // Get an instance of the sensor service, and use that to get an instance of
         // a particular sensor.
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mProximity = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
         sensorListener = SensorListenerImpl.getSensorListenerImpl();
     }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-//        Log.e("Accelerometer", "x-"+sensorEvent.values[0]+" y-"+sensorEvent.values[1]+" z-"+sensorEvent.values[2]);
         sensorListener.listen(sensorEvent, context);
     }
 
@@ -34,12 +34,12 @@ public class AccelerometerSensorActivity implements SensorEventListener {
         // Override to comply Implementing SensorEventListener
     }
 
-    void onResume(){
+    public void onResume(){
         // Register a listen for the sensor.
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    void onPause(){
+    public void onPause(){
         // Be sure to unregister the sensor when the activity pauses.
         mSensorManager.unregisterListener(this);
     }

@@ -3,6 +3,10 @@ package com.example.sahan.scunus;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.example.sahan.scunus.Sensors.AccelerometerSensorActivity;
+import com.example.sahan.scunus.Sensors.ProximitySensorActivity;
+import com.example.sahan.scunus.Sensors.SensorListenerImpl;
+
 
 public class ReceiverActivity extends AppCompatActivity {
 

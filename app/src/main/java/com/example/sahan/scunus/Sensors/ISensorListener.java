@@ -1,4 +1,4 @@
-package com.example.sahan.scunus;
+package com.example.sahan.scunus.Sensors;
 
 import android.content.Context;
 import android.hardware.SensorEvent;

@@ -1,4 +1,4 @@
-package com.example.sahan.scunus;
+package com.example.sahan.scunus.Sensors;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,6 +6,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.util.Log;
 import android.widget.EditText;
+
+import com.example.sahan.scunus.Constants;
+import com.example.sahan.scunus.R;
 
 
 public class SensorListenerImpl implements ISensorListener {
@@ -51,7 +54,9 @@ public class SensorListenerImpl implements ISensorListener {
                 // Use the GenerateSound class to generate sound from the given text
                 if (Constants.SENDER_ACTIVITY.equals(context.getClass().getCanonicalName())) {
                     Activity a = (Activity) context;
-                    Log.e( "EditText value", ((EditText) a.findViewById(R.id.editText)).getText().toString());
+                    String msg = ((EditText) a.findViewById(R.id.editText)).getText().toString();
+                    Log.e( "EditText value", msg);
+
                 } else if (Constants.RECEIVER_ACTIVITY.equals(context.getClass().getCanonicalName())) {
 
                 }
