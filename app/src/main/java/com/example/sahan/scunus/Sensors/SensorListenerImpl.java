@@ -10,6 +10,7 @@ import android.widget.EditText;
 import com.example.sahan.scunus.Constants;
 import com.example.sahan.scunus.R;
 
+import java.nio.charset.StandardCharsets;
 
 public class SensorListenerImpl implements ISensorListener {
 
@@ -18,6 +19,7 @@ public class SensorListenerImpl implements ISensorListener {
     private float currentAccel;
     private float lastAccel;
     private float mAccel;
+    private boolean isReadyToProcess;
 
     private SensorListenerImpl() {
         currentAccel = Sensor.TYPE_GRAVITY;
@@ -46,7 +48,10 @@ public class SensorListenerImpl implements ISensorListener {
 //            mAccel = mAccel * 0.9f + delta; // perform low-cut filter
 
             // If the other Phone is in proximity and stopped moving, then proceed.
-            if(isNear && ( mAccel == 0.0 )){
+            if(isNear && isReadyToProcess && ( mAccel == 0.0 )){
+                // set isReadyToProcess
+                isReadyToProcess = false;
+
                 Log.e("Accelerometer", "x-" + x + " y-" + y + " z-" + z);
                 Log.e("Accel", "" + mAccel);
                 Log.e( "CURRENT Activity", context.getClass().getCanonicalName());
@@ -55,7 +60,9 @@ public class SensorListenerImpl implements ISensorListener {
                 if (Constants.SENDER_ACTIVITY.equals(context.getClass().getCanonicalName())) {
                     Activity a = (Activity) context;
                     String msg = ((EditText) a.findViewById(R.id.editText)).getText().toString();
-                    Log.e( "EditText value", msg);
+                    byte b = msg.getBytes(StandardCharsets.UTF_8)[0];
+                    Log.e( "EditText value [0]", Integer.toBinaryString(b));
+//                    Log.e( "EditText value", Arrays.toString(msg.getBytes(StandardCharsets.UTF_8)));
 
                 } else if (Constants.RECEIVER_ACTIVITY.equals(context.getClass().getCanonicalName())) {
 
@@ -69,6 +76,7 @@ public class SensorListenerImpl implements ISensorListener {
             } else {
                 Log.e("Proximity", "Far");
                 isNear = false;
+                isReadyToProcess = true;
             }
         }
     }
