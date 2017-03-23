@@ -25,9 +25,7 @@ public class SenderActivity extends AppCompatActivity {
         setContentView(R.layout.sender);
         proximitySensorActivity = new ProximitySensorActivity(this);
         accelerometerSensorActivity = new AccelerometerSensorActivity(this);
-
         editText = (EditText) findViewById(R.id.editText);
-
     }
 
     @Override

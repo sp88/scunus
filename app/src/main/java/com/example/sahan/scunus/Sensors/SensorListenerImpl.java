@@ -7,10 +7,12 @@ import android.hardware.SensorEvent;
 import android.util.Log;
 import android.widget.EditText;
 
+import com.example.sahan.scunus.Arithmetic.SamplingLoop;
 import com.example.sahan.scunus.Constants;
+import com.example.sahan.scunus.Demodulator.FrequencyScanner;
+import com.example.sahan.scunus.Generator.Modulator;
+import com.example.sahan.scunus.Generator.SoundGenerator;
 import com.example.sahan.scunus.R;
-
-import java.nio.charset.StandardCharsets;
 
 public class SensorListenerImpl implements ISensorListener {
 
@@ -20,6 +22,7 @@ public class SensorListenerImpl implements ISensorListener {
     private float lastAccel;
     private float mAccel;
     private boolean isReadyToProcess;
+    private SamplingLoop samplingLoop;
 
     private SensorListenerImpl() {
         currentAccel = Sensor.TYPE_GRAVITY;
@@ -45,27 +48,27 @@ public class SensorListenerImpl implements ISensorListener {
             lastAccel = currentAccel;
             currentAccel = (float) Math.sqrt((x*x + y*y + z*z));
             mAccel = currentAccel - lastAccel;
-//            mAccel = mAccel * 0.9f + delta; // perform low-cut filter
 
             // If the other Phone is in proximity and stopped moving, then proceed.
             if(isNear && isReadyToProcess && ( mAccel == 0.0 )){
                 // set isReadyToProcess
                 isReadyToProcess = false;
 
-                Log.e("Accelerometer", "x-" + x + " y-" + y + " z-" + z);
-                Log.e("Accel", "" + mAccel);
-                Log.e( "CURRENT Activity", context.getClass().getCanonicalName());
+//                Log.e("Accelerometer", "x-" + x + " y-" + y + " z-" + z);
+//                Log.e("Accel", "" + mAccel);
+//                Log.e( "CURRENT Activity", context.getClass().getCanonicalName());
 
                 // Use the GenerateSound class to generate sound from the given text
                 if (Constants.SENDER_ACTIVITY.equals(context.getClass().getCanonicalName())) {
                     Activity a = (Activity) context;
                     String msg = ((EditText) a.findViewById(R.id.editText)).getText().toString();
-                    byte b = msg.getBytes(StandardCharsets.UTF_8)[0];
-                    Log.e( "EditText value [0]", Integer.toBinaryString(b));
-//                    Log.e( "EditText value", Arrays.toString(msg.getBytes(StandardCharsets.UTF_8)));
-
+                    new SoundGenerator().generateSignal(msg);
+                    Log.e("Activity", "Sender");
                 } else if (Constants.RECEIVER_ACTIVITY.equals(context.getClass().getCanonicalName())) {
-
+                    Log.e("Activity", "Receiver");
+//                    new FrequencyScanner().recordSound();
+                    samplingLoop = new SamplingLoop();
+                    samplingLoop.start();
                 }
             }
 
@@ -77,6 +80,9 @@ public class SensorListenerImpl implements ISensorListener {
                 Log.e("Proximity", "Far");
                 isNear = false;
                 isReadyToProcess = true;
+                if(samplingLoop != null){
+                    samplingLoop.finish();
+                }
             }
         }
     }

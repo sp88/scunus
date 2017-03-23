@@ -2,10 +2,20 @@ package com.example.sahan.scunus;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.widget.TextView;
 
 import com.example.sahan.scunus.Sensors.AccelerometerSensorActivity;
 import com.example.sahan.scunus.Sensors.ProximitySensorActivity;
 import com.example.sahan.scunus.Sensors.SensorListenerImpl;
+
+import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.AudioEvent;
+import be.tarsos.dsp.AudioProcessor;
+import be.tarsos.dsp.io.android.AudioDispatcherFactory;
+import be.tarsos.dsp.pitch.PitchDetectionHandler;
+import be.tarsos.dsp.pitch.PitchDetectionResult;
+import be.tarsos.dsp.pitch.PitchProcessor;
 
 
 public class ReceiverActivity extends AppCompatActivity {
@@ -13,6 +23,8 @@ public class ReceiverActivity extends AppCompatActivity {
     private ProximitySensorActivity proximitySensorActivity;
     private AccelerometerSensorActivity accelerometerSensorActivity;
     private SensorListenerImpl sensorListener;
+    private TextView hzTextView;
+    private TextView msgTextView;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -23,8 +35,31 @@ public class ReceiverActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.receiver);
+        hzTextView = (TextView) findViewById(R.id.hzTextView);
+        msgTextView = (TextView) findViewById(R.id.msgTextView);
         proximitySensorActivity = new ProximitySensorActivity(this);
         accelerometerSensorActivity = new AccelerometerSensorActivity(this);
+
+//        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,4096,0);
+//
+//        PitchDetectionHandler pdh = new PitchDetectionHandler() {
+//
+//            @Override
+//            public void handlePitch(PitchDetectionResult result,AudioEvent e) {
+//                final float pitchInHz = result.getPitch();
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        TextView text = (TextView) findViewById(R.id.hzTextView);
+//                        text.setText(pitchInHz + "Hz " );
+////                        Log.e("Hz", String.valueOf(pitchInHz));
+//                    }
+//                });
+//            }
+//        };
+//        AudioProcessor p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 4096, pdh);
+//        dispatcher.addAudioProcessor(p);
+//        new Thread(dispatcher,"Audio Dispatcher").start();
 
     }
 
