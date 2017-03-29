@@ -7,10 +7,20 @@ import android.media.AudioTrack;
 
 import com.example.sahan.scunus.Constants;
 
-public class SoundGenerator {
+public class SoundGenerator extends Thread {
 
+    private String msg;
 
-    public void generateSignal(String msg){
+    public SoundGenerator(String _msg){
+        msg = _msg;
+    }
+
+    @Override
+    public void run(){
+        generateSignal();
+    }
+
+    private void generateSignal(){
         //TODO: Implement F.E.C
         // Modulate message
         Modulator modulator = new Modulator();

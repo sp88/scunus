@@ -23,6 +23,7 @@ public class SensorListenerImpl implements ISensorListener {
     private float mAccel;
     private boolean isReadyToProcess;
     private SamplingLoop samplingLoop;
+    private SoundGenerator soundGenerator;
 
     private SensorListenerImpl() {
         currentAccel = Sensor.TYPE_GRAVITY;
@@ -62,13 +63,18 @@ public class SensorListenerImpl implements ISensorListener {
                 if (Constants.SENDER_ACTIVITY.equals(context.getClass().getCanonicalName())) {
                     Activity a = (Activity) context;
                     String msg = ((EditText) a.findViewById(R.id.editText)).getText().toString();
-                    new SoundGenerator().generateSignal(msg);
                     Log.e("Activity", "Sender");
+                    if(soundGenerator == null){
+                        soundGenerator = new SoundGenerator(msg);
+                        soundGenerator.start();
+                    }
                 } else if (Constants.RECEIVER_ACTIVITY.equals(context.getClass().getCanonicalName())) {
                     Log.e("Activity", "Receiver");
 //                    new FrequencyScanner().recordSound();
-                    samplingLoop = new SamplingLoop();
-                    samplingLoop.start();
+                    if(samplingLoop == null) {
+                        samplingLoop = new SamplingLoop(context);
+                        samplingLoop.start();
+                    }
                 }
             }
 
@@ -82,7 +88,9 @@ public class SensorListenerImpl implements ISensorListener {
                 isReadyToProcess = true;
                 if(samplingLoop != null){
                     samplingLoop.finish();
+                    samplingLoop = null;
                 }
+                soundGenerator = null;
             }
         }
     }

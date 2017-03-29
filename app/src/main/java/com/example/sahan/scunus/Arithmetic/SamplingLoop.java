@@ -13,18 +13,29 @@ package com.example.sahan.scunus.Arithmetic;/* Copyright 2014 Eddy Xiao <bewantb
  * limitations under the License.
  */
 
+import android.app.Activity;
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.SystemClock;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.example.sahan.scunus.Arithmetic.STFT;
 import com.example.sahan.scunus.Constants;
+import com.example.sahan.scunus.R;
+import com.example.sahan.scunus.ReceiverActivity;
+
+import org.w3c.dom.Text;
 
 import java.util.Arrays;
 
 import be.tarsos.dsp.synthesis.SineGenerator;
+
+import static com.example.sahan.scunus.R.id.editText;
+import static com.example.sahan.scunus.R.id.hzTextView;
+import static com.example.sahan.scunus.R.id.textView;
 
 /**
  * Read a snapshot of audio data at a regular interval, and compute the FFT
@@ -40,6 +51,7 @@ public class SamplingLoop extends Thread {
     private STFT stft;   // use with care
     final int RECORDER_AGC_OFF = MediaRecorder.AudioSource.VOICE_RECOGNITION;
     int audioSourceId = RECORDER_AGC_OFF;
+    Activity activity;
 //    private final AnalyzerParameters analyzerParam;
 
 //    private SineGenerator sineGen1;
@@ -51,7 +63,8 @@ public class SamplingLoop extends Thread {
     volatile double wavSecRemain;
     volatile double wavSec = 0;
 
-    public SamplingLoop(){ //AnalyzerActivity _activity, AnalyzerParameters _analyzerParam) {
+    public SamplingLoop(Context context){ //AnalyzerActivity _activity, AnalyzerParameters _analyzerParam) {
+        activity = (Activity) context;
 //        activity = _activity;
 //        analyzerParam = _analyzerParam;
 //
@@ -270,7 +283,10 @@ public class SamplingLoop extends Thread {
 //                Log.e("spectrum 1st",  spectrumDB[0]+"");
 //                Log.e("spectrum last", spectrumDB[spectrumDB.length-1]+"");
 //                if(spectrumDB[427] > -20.0){
-                    Log.e("427th bin", String.valueOf( spectrumDB[427] ));
+//                    Log.e("423th bin", String.valueOf( spectrumDB[423] ));
+//                    Log.e("424th bin", String.valueOf( spectrumDB[424] ));
+//                    Log.e("425th bin", String.valueOf( spectrumDB[425] ));
+                    Log.e("435th bin", String.valueOf( spectrumDB[435] ));
 //                }
 //                Log.e("spectrum", Arrays.toString(spectrumDB));
 //                System.arraycopy(spectrumDB, 0, spectrumDBcopy, 0, spectrumDB.length);
@@ -278,10 +294,21 @@ public class SamplingLoop extends Thread {
 //          fpsCounter.inc();
 
                 stft.calculatePeak();
-                if(stft.maxAmpFreq > 17990 && stft.maxAmpFreq < 18010) {
+//                if(stft.maxAmpFreq > 17990 && stft.maxAmpFreq < 18010) {
                     Log.e("max Freq", String.valueOf(stft.maxAmpFreq));
                     Log.e("max AmpDB", String.valueOf(stft.maxAmpDB));
-                }
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            TextView hzTextView = (TextView) activity.findViewById(R.id.hzTextView);
+                            hzTextView.setText((int)stft.maxAmpFreq + ": "
+                                    + (int)stft.maxAmpDB + ": "
+                                    +  20*Math.log10(stft.getRMSFromFT()) + ": "
+                                    +  20*Math.log10(stft.getRMS()));
+                        }
+                    });
+//                }
+
 //                activity.maxAmpFreq = stft.maxAmpFreq;
 //                activity.maxAmpDB = stft.maxAmpDB;
 
