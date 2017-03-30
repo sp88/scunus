@@ -31,16 +31,28 @@ public class SoundGenerator extends Thread {
 //        playSoundSignal(18000, 44100*5);
     }
 
-
+    private AudioTrack audioTrack;
     private void playSound(byte[] generatedSnd){
-        final AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-                Constants.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO,
-                AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length,
-                AudioTrack.MODE_STREAM);
+        try {
+            audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+                    Constants.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length,
+                    AudioTrack.MODE_STREAM);
+        } catch (IllegalStateException ie){
+            ie.printStackTrace();
+            return;
+        }
         audioTrack.write(generatedSnd, 0, generatedSnd.length);
         audioTrack.play();
 //        audioTrack.stop();
 //        mAudioTrack.release();
+    }
+
+    public void finish(){
+        if(audioTrack != null){
+            audioTrack.stop();
+            audioTrack.release();
+        }
     }
 
 

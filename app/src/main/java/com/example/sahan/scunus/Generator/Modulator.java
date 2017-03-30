@@ -2,27 +2,31 @@ package com.example.sahan.scunus.Generator;
 
 import android.util.Log;
 
+import com.example.sahan.scunus.Alphabet;
+import com.example.sahan.scunus.Constants;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Hex;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 public class Modulator {
 
-    private final int duration = 1; // seconds
-    private final int sampleRate = 44100;
-    private final int numSamples = duration * sampleRate;
-    private final double sample[] = new double[numSamples];
-    private final double freqOfTone = 18130; // hz
-    private final byte generatedSnd[] = new byte[2 * numSamples];
+    private double startEndToneDuration = 0.5;  // seconds
+    private double dataToneDuration =  0.023; // seconds
+    private byte generatedSnd[];
+    private int sampleRate = Constants.SAMPLE_RATE;
+    private int idx = 0;
+    private HashMap alphabet = new Alphabet().getAlphabet();
 
     public String toHex(String arg) {
         return String.format("%x", new BigInteger(1, arg.getBytes(StandardCharsets.UTF_8)));
     }
 
-    private String getModulatedString(String data){
+//    private String getModulatedString(String data){
 
 //        byte[] bArray = data.getBytes(StandardCharsets.UTF_8);
 //        StringBuilder binaryString = new StringBuilder();
@@ -34,10 +38,19 @@ public class Modulator {
 //        Log.e( "EditText value", binaryString.toString());
 ////        Log.e( "EditText value", Arrays.toString(data.getBytes(StandardCharsets.UTF_8)) );
 //        return binaryString.toString();
-        return toHex(data);
-    }
+//        return toHex(data);
+//    }
 
     byte[] getTone(String msg){
+        // calculate samples of full signal
+        // 2* as two symbols per character
+        // start samples + data samples + end samples = total samples of the signal
+        // create full signal array
+        final int signalSample =  (int)  ((startEndToneDuration * sampleRate));/* +
+                                    (2 * msg.length() * dataToneDuration * sampleRate) +
+                                    (startEndToneDuration * sampleRate));*/
+        generatedSnd = new byte[2 * signalSample];
+
         // get modulated string
 //        String modulatedString = getModulatedString(msg);
         Hex hex = new Hex();
@@ -57,28 +70,41 @@ public class Modulator {
         String str = new String((byte [])b, StandardCharsets.UTF_8);
         Log.e("Original string", str);
 
+        idx = 0;
         // create 'start tone'
+        fillTone(startEndToneDuration, (Double) alphabet.get("START"));
+//        fillTone(startEndToneDuration, 18734.0);
 
+        // fill data tones
+//        for(char c : (char[]) modulatedString){
+//            fillTone(startEndToneDuration, (Double) alphabet.get(String.valueOf(c)));
+//        }
+
+        // create 'end tone'
+//        fillTone(startEndToneDuration, (Double) alphabet.get("END"));
+
+        return generatedSnd;
+    }
+
+    private void fillTone(double duration, double freqOfTone){
+        int numSamples = (int) (duration * sampleRate);
+        double sample[] = new double[numSamples];
 
         // fill out the array
         for (int i = 0; i < numSamples; ++i) {
-            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/freqOfTone));
+            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate /freqOfTone));
         }
 
         // convert to 16 bit pcm sound array
         // assumes the sample buffer is normalised.
-        int idx = 0;
+
         for (final double dVal : sample) {
             // scale to maximum amplitude
-            final short val = (short) ((dVal * 32767));
+            final short val = (short) ((dVal * Short.MAX_VALUE));
             // in 16 bit wav PCM, first byte is the low order byte
             generatedSnd[idx++] = (byte) (val & 0x00ff);
             generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
         }
-
-        // create 'end tone'
-
-        return generatedSnd;
     }
 
 }

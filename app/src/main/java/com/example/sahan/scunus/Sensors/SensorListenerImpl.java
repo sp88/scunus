@@ -90,7 +90,10 @@ public class SensorListenerImpl implements ISensorListener {
                     samplingLoop.finish();
                     samplingLoop = null;
                 }
-                soundGenerator = null;
+                if(soundGenerator != null){
+                    soundGenerator.finish();
+                    soundGenerator = null;
+                }
             }
         }
     }
