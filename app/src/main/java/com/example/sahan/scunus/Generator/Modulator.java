@@ -46,10 +46,12 @@ public class Modulator {
         // 2* as two symbols per character
         // start samples + data samples + end samples = total samples of the signal
         // create full signal array
-        final int signalSample =  (int)  ((startEndToneDuration * sampleRate));/* +
+        final int signalSample =  (int)  ((startEndToneDuration * sampleRate) +
                                     (2 * msg.length() * dataToneDuration * sampleRate) +
-                                    (startEndToneDuration * sampleRate));*/
+                                    (startEndToneDuration * sampleRate));
         generatedSnd = new byte[2 * signalSample];
+        Log.e("signalSample", String.valueOf(signalSample));
+        Log.e("generatedSnd length", String.valueOf(generatedSnd.length));
 
         // get modulated string
 //        String modulatedString = getModulatedString(msg);
@@ -60,7 +62,8 @@ public class Modulator {
         } catch (EncoderException e) {
             e.printStackTrace();
         }
-        Log.e("Hex string", new String((char[]) modulatedString));
+        String hexString = new String((char[]) modulatedString);
+        Log.e("Hex string", hexString);
         Object b = new byte[1];
         try {
             b = hex.decode(modulatedString);
@@ -76,12 +79,14 @@ public class Modulator {
 //        fillTone(startEndToneDuration, 18734.0);
 
         // fill data tones
-//        for(char c : (char[]) modulatedString){
-//            fillTone(startEndToneDuration, (Double) alphabet.get(String.valueOf(c)));
-//        }
+        for(char c : (char[]) modulatedString){
+//        for(int i=0; i < hexString.length(); i++){
+            fillTone(dataToneDuration,
+                        (Double) alphabet.get(String.valueOf(c)));
+        }
 
         // create 'end tone'
-//        fillTone(startEndToneDuration, (Double) alphabet.get("END"));
+        fillTone(startEndToneDuration, (Double) alphabet.get("END"));
 
         return generatedSnd;
     }
@@ -89,6 +94,7 @@ public class Modulator {
     private void fillTone(double duration, double freqOfTone){
         int numSamples = (int) (duration * sampleRate);
         double sample[] = new double[numSamples];
+        Log.e("numSamples", String.valueOf(numSamples));
 
         // fill out the array
         for (int i = 0; i < numSamples; ++i) {
