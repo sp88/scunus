@@ -2,9 +2,12 @@ package com.example.sahan.scunus.Generator;
 
 import android.util.Log;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.EncoderException;
+import org.apache.commons.codec.binary.Hex;
+
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
 
 public class Modulator {
 
@@ -12,34 +15,47 @@ public class Modulator {
     private final int sampleRate = 44100;
     private final int numSamples = duration * sampleRate;
     private final double sample[] = new double[numSamples];
-    private final double freqOfTone = 18000; // hz
+    private final double freqOfTone = 18130; // hz
     private final byte generatedSnd[] = new byte[2 * numSamples];
-    private final HashMap<String, Integer> hmap = new HashMap<>();
 
-    {
-        hmap.put("00", 18200);
-        hmap.put("01", 18400);
-        hmap.put("10", 18600);
-        hmap.put("11", 18800);
+    public String toHex(String arg) {
+        return String.format("%x", new BigInteger(1, arg.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String getModulatedString(String data){
+    private String getModulatedString(String data){
 
-        byte[] bArray = data.getBytes(StandardCharsets.UTF_8);
-        StringBuilder binaryString = new StringBuilder();
-        for (byte b: bArray){
-            binaryString.append('0');
-            binaryString.append(Integer.toBinaryString(b));
-        }
-
-        Log.e( "EditText value", binaryString.toString());
-//        Log.e( "EditText value", Arrays.toString(data.getBytes(StandardCharsets.UTF_8)) );
-        return binaryString.toString();
+//        byte[] bArray = data.getBytes(StandardCharsets.UTF_8);
+//        StringBuilder binaryString = new StringBuilder();
+//        for (byte b: bArray){
+//            binaryString.append('0');
+//            binaryString.append(Integer.toBinaryString(b));
+//        }
+//
+//        Log.e( "EditText value", binaryString.toString());
+////        Log.e( "EditText value", Arrays.toString(data.getBytes(StandardCharsets.UTF_8)) );
+//        return binaryString.toString();
+        return toHex(data);
     }
 
     byte[] getTone(String msg){
         // get modulated string
-        String modulatedString = getModulatedString(msg);
+//        String modulatedString = getModulatedString(msg);
+        Hex hex = new Hex();
+        Object modulatedString = new char[1];
+        try {
+            modulatedString = hex.encode(msg);
+        } catch (EncoderException e) {
+            e.printStackTrace();
+        }
+        Log.e("Hex string", new String((char[]) modulatedString));
+        Object b = new byte[1];
+        try {
+            b = hex.decode(modulatedString);
+        } catch (DecoderException e) {
+            e.printStackTrace();
+        }
+        String str = new String((byte [])b, StandardCharsets.UTF_8);
+        Log.e("Original string", str);
 
         // create 'start tone'
 
