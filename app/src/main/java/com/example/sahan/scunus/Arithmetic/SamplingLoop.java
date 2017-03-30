@@ -22,20 +22,8 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.example.sahan.scunus.Arithmetic.STFT;
 import com.example.sahan.scunus.Constants;
 import com.example.sahan.scunus.R;
-import com.example.sahan.scunus.ReceiverActivity;
-
-import org.w3c.dom.Text;
-
-import java.util.Arrays;
-
-import be.tarsos.dsp.synthesis.SineGenerator;
-
-import static com.example.sahan.scunus.R.id.editText;
-import static com.example.sahan.scunus.R.id.hzTextView;
-import static com.example.sahan.scunus.R.id.textView;
 
 /**
  * Read a snapshot of audio data at a regular interval, and compute the FFT
@@ -52,6 +40,7 @@ public class SamplingLoop extends Thread {
     final int RECORDER_AGC_OFF = MediaRecorder.AudioSource.VOICE_RECOGNITION;
     int audioSourceId = RECORDER_AGC_OFF;
     Activity activity;
+    private int scunusCounter = 0;
 //    private final AnalyzerParameters analyzerParam;
 
 //    private SineGenerator sineGen1;
@@ -146,7 +135,7 @@ public class SamplingLoop extends Thread {
     @Override
     public void run() {
         AudioRecord record;
-
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
 //        long tStart = SystemClock.uptimeMillis();
 //        try {
@@ -249,6 +238,7 @@ public class SamplingLoop extends Thread {
         // When running in this loop (including when paused), you can not change properties
         // related to recorder: e.g. audioSourceId, sampleRate, bufferSampleSize
         // TODO: allow change of FFT length on the fly.
+        scunusCounter = 0;
         while (isRunning) {
             // Read data
 //            if (analyzerParam.audioSourceId >= 1000) {
@@ -286,7 +276,7 @@ public class SamplingLoop extends Thread {
 //                    Log.e("423th bin", String.valueOf( spectrumDB[423] ));
 //                    Log.e("424th bin", String.valueOf( spectrumDB[424] ));
 //                    Log.e("425th bin", String.valueOf( spectrumDB[425] ));
-                    Log.e("435th bin", String.valueOf( spectrumDB[435] ));
+//                    Log.e("435th bin", String.valueOf( spectrumDB[435] ));
 //                }
 //                Log.e("spectrum", Arrays.toString(spectrumDB));
 //                System.arraycopy(spectrumDB, 0, spectrumDBcopy, 0, spectrumDB.length);
@@ -295,8 +285,8 @@ public class SamplingLoop extends Thread {
 
                 stft.calculatePeak();
 //                if(stft.maxAmpFreq > 17990 && stft.maxAmpFreq < 18010) {
-                    Log.e("max Freq", String.valueOf(stft.maxAmpFreq));
-                    Log.e("max AmpDB", String.valueOf(stft.maxAmpDB));
+//                    Log.e("max Freq", String.valueOf(stft.maxAmpFreq));
+//                    Log.e("max AmpDB", String.valueOf(stft.maxAmpDB));
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -306,8 +296,16 @@ public class SamplingLoop extends Thread {
                                     +  20*Math.log10(stft.getRMSFromFT()) + ": "
                                     +  20*Math.log10(stft.getRMS()));
                         }
-                    });
+                    }); // END - runOnUiThread
 //                }
+
+                double rms = 20*Math.log10(stft.getRMSFromFT());
+                for(int i = Constants.START_TONE_BIN; i <= Constants.END_TONE_BIN; i++){
+                    if( Math.abs(Math.abs(spectrumDB[i]) - Math.abs(rms)) < 5 ){
+                        Log.e("Bin", String.valueOf(i));
+                        scunusCounter++;
+                    }
+                }
 
 //                activity.maxAmpFreq = stft.maxAmpFreq;
 //                activity.maxAmpDB = stft.maxAmpDB;
@@ -321,6 +319,7 @@ public class SamplingLoop extends Thread {
         Log.i(TAG, "Arithmetic.SamplingLoop::Run(): Stopping and releasing recorder.");
         record.stop();
         record.release();
+        Log.e("ScunusCount", String.valueOf(scunusCounter));
 //        if (bSaveWavLoop) {
 //            Log.i(TAG, "com.example.sahan.scunus.Arithmetic.SamplingLoop::Run(): Ending saved wav.");
 //            wavWriter.stop();
