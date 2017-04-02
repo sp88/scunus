@@ -135,7 +135,7 @@ public class SamplingLoop extends Thread {
     @Override
     public void run() {
         AudioRecord record;
-        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+//        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
 //        long tStart = SystemClock.uptimeMillis();
 //        try {
@@ -300,11 +300,20 @@ public class SamplingLoop extends Thread {
 //                }
 
                 double rms = 20*Math.log10(stft.getRMSFromFT());
+                int maxPowerBin = -1;
+                double maxPower = spectrumDB[Constants.START_TONE_BIN];
+
                 for(int i = Constants.START_TONE_BIN; i <= Constants.END_TONE_BIN; i++){
-                    if( Math.abs(Math.abs(spectrumDB[i]) - Math.abs(rms)) < 5 ){
-                        Log.e("Bin", String.valueOf(i));
-                        scunusCounter++;
+                    if( (Math.abs(Math.abs(spectrumDB[i]) - Math.abs(rms)) < 5) &&
+                            (spectrumDB[i] >= maxPower)){
+                        maxPowerBin = i;
+                        maxPower = spectrumDB[i];
                     }
+                }
+
+                if(maxPowerBin != -1){
+                    Log.e("Bin", String.valueOf(maxPowerBin));
+                    scunusCounter++;
                 }
 
 //                activity.maxAmpFreq = stft.maxAmpFreq;
@@ -314,7 +323,8 @@ public class SamplingLoop extends Thread {
 //                activity.dtRMS = stft.getRMS();
 //                activity.dtRMSFromFT = stft.getRMSFromFT();
             }
-        }
+        } // END - while(isRunning)
+
 //        Log.i(TAG, "Arithmetic.SamplingLoop::Run(): Actual sample rate: " + recorderMonitor.getSampleRate());
         Log.i(TAG, "Arithmetic.SamplingLoop::Run(): Stopping and releasing recorder.");
         record.stop();

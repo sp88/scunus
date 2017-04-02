@@ -66,6 +66,7 @@ public class SensorListenerImpl implements ISensorListener {
                     Log.e("Activity", "Sender");
                     if(soundGenerator == null){
                         soundGenerator = new SoundGenerator(msg);
+                        soundGenerator.setPriority(Thread.MAX_PRIORITY);
                         soundGenerator.start();
                     }
                 } else if (Constants.RECEIVER_ACTIVITY.equals(context.getClass().getCanonicalName())) {
@@ -73,6 +74,7 @@ public class SensorListenerImpl implements ISensorListener {
 //                    new FrequencyScanner().recordSound();
                     if(samplingLoop == null) {
                         samplingLoop = new SamplingLoop(context);
+                        samplingLoop.setPriority(Thread.MAX_PRIORITY);
                         samplingLoop.start();
                     }
                 }
