@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.EditText;
 
@@ -22,8 +23,10 @@ public class SensorListenerImpl implements ISensorListener {
     private float lastAccel;
     private float mAccel;
     private boolean isReadyToProcess;
-    private SamplingLoop samplingLoop;
-    private SoundGenerator soundGenerator;
+    private volatile SamplingLoop samplingLoop;
+    private volatile SoundGenerator soundGenerator;
+    private PlayerAsync playerAsync;
+    private RecorderAsync recorderAsync;
 
     private SensorListenerImpl() {
         currentAccel = Sensor.TYPE_GRAVITY;
@@ -64,18 +67,16 @@ public class SensorListenerImpl implements ISensorListener {
                     Activity a = (Activity) context;
                     String msg = ((EditText) a.findViewById(R.id.editText)).getText().toString();
                     Log.e("Activity", "Sender");
-                    if(soundGenerator == null){
-                        soundGenerator = new SoundGenerator(msg);
-                        soundGenerator.setPriority(Thread.MAX_PRIORITY);
-                        soundGenerator.start();
+                    if(playerAsync == null){
+                        playerAsync = new PlayerAsync();
+                        playerAsync.execute(new String[]{msg});
                     }
                 } else if (Constants.RECEIVER_ACTIVITY.equals(context.getClass().getCanonicalName())) {
                     Log.e("Activity", "Receiver");
 //                    new FrequencyScanner().recordSound();
-                    if(samplingLoop == null) {
-                        samplingLoop = new SamplingLoop(context);
-                        samplingLoop.setPriority(Thread.MAX_PRIORITY);
-                        samplingLoop.start();
+                    if(recorderAsync == null) {
+                        recorderAsync = new RecorderAsync();
+                        recorderAsync.execute();
                     }
                 }
             }
@@ -88,14 +89,82 @@ public class SensorListenerImpl implements ISensorListener {
                 Log.e("Proximity", "Far");
                 isNear = false;
                 isReadyToProcess = true;
-                if(samplingLoop != null){
-                    samplingLoop.finish();
-                    samplingLoop = null;
+                Log.e("recorderAsync", String.valueOf(recorderAsync == null));
+                if(recorderAsync != null){
+                    recorderAsync.cancel(true);
+                    recorderAsync = null;
+                    Log.e("recorderAsync", "null");
                 }
-                if(soundGenerator != null){
-                    soundGenerator.finish();
-                    soundGenerator = null;
+                Log.e("playerAsync", String.valueOf(playerAsync == null));
+                if(playerAsync != null){
+                    playerAsync.cancel(true);
+                    playerAsync = null;
+                    Log.e("playerAsync", "null");
                 }
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    private class RecorderAsync extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if(!isCancelled()) {
+                samplingLoop = new SamplingLoop();
+                samplingLoop.run();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onCancelled() {
+            if(samplingLoop != null) {
+                samplingLoop.finish();
+                samplingLoop = null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+//            super.onPostExecute(aVoid);
+            if(samplingLoop != null) {
+                samplingLoop.finish();
+                samplingLoop = null;
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    private class PlayerAsync extends AsyncTask<String, Void, Void>{
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            if(!isCancelled()) {
+                soundGenerator = new SoundGenerator(strings[0]);
+                soundGenerator.run();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onCancelled() {
+            if(soundGenerator != null) {
+                soundGenerator.finish();
+                soundGenerator = null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+//            super.onPostExecute(aVoid);
+            if(soundGenerator != null) {
+                soundGenerator.finish();
+                soundGenerator = null;
             }
         }
     }

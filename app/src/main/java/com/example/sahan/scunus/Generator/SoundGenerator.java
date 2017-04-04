@@ -4,10 +4,11 @@ package com.example.sahan.scunus.Generator;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.util.Log;
 
 import com.example.sahan.scunus.Constants;
 
-public class SoundGenerator extends Thread {
+public class SoundGenerator{//} extends Thread {
 
     private String msg;
 
@@ -15,7 +16,7 @@ public class SoundGenerator extends Thread {
         msg = _msg;
     }
 
-    @Override
+
     public void run(){
         generateSignal();
     }
@@ -44,14 +45,18 @@ public class SoundGenerator extends Thread {
         }
         audioTrack.write(generatedSnd, 0, generatedSnd.length);
         audioTrack.play();
+        Log.e("SoundGenerator", "Played Sound");
 //        audioTrack.stop();
-//        mAudioTrack.release();
+//        audioTrack.release();
+//        Log.e("SoundGenerator", "release after play");
     }
 
     public void finish(){
+        Log.e("SoundGenerator", "Called SoundGenerator FINISH");
         if(audioTrack != null){
             audioTrack.stop();
             audioTrack.release();
+            Log.e("SoundGenerator", "audio track released");
         }
     }
 

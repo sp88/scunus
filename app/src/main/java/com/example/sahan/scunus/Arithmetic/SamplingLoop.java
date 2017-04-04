@@ -35,7 +35,7 @@ import java.util.List;
  *         bewantbe@gmail.com
  */
 
-public class SamplingLoop extends Thread {
+public class SamplingLoop {//extends Thread {
     private static final int BYTE_OF_SAMPLE = 2;
     private final String TAG = "Arithmetic.SamplingLoop";
     private volatile boolean isRunning = true;
@@ -43,13 +43,13 @@ public class SamplingLoop extends Thread {
     private STFT stft;   // use with care
     final int RECORDER_AGC_OFF = MediaRecorder.AudioSource.VOICE_RECOGNITION;
     int audioSourceId = RECORDER_AGC_OFF;
-    Activity activity;
+//    Activity activity;
     private int scunusCounter = 0;
-    public SamplingLoop(Context context){ //AnalyzerActivity _activity, AnalyzerParameters _analyzerParam) {
-        activity = (Activity) context;
+    public SamplingLoop(){//Context context){ //AnalyzerActivity _activity, AnalyzerParameters _analyzerParam) {
+//        activity = (Activity) context;
     }
 
-    @Override
+
     public void run() {
         AudioRecord record;
 
@@ -133,16 +133,16 @@ public class SamplingLoop extends Thread {
 //                if(stft.maxAmpFreq > 17990 && stft.maxAmpFreq < 18010) {
 //                    Log.e("max Freq", String.valueOf(stft.maxAmpFreq));
 //                    Log.e("max AmpDB", String.valueOf(stft.maxAmpDB));
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            TextView hzTextView = (TextView) activity.findViewById(R.id.hzTextView);
-                            hzTextView.setText((int)stft.maxAmpFreq + ": "
-                                    + (int)stft.maxAmpDB + ": "
-                                    +  20*Math.log10(stft.getRMSFromFT()) + ": "
-                                    +  20*Math.log10(stft.getRMS()));
-                        }
-                    }); // END - runOnUiThread
+//                    activity.runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            TextView hzTextView = (TextView) activity.findViewById(R.id.hzTextView);
+//                            hzTextView.setText((int)stft.maxAmpFreq + ": "
+//                                    + (int)stft.maxAmpDB + ": "
+//                                    +  20*Math.log10(stft.getRMSFromFT()) + ": "
+//                                    +  20*Math.log10(stft.getRMS()));
+//                        }
+//                    }); // END - runOnUiThread
 //                }
 
                 double rms = 20*Math.log10(stft.getRMSFromFT());
@@ -183,6 +183,7 @@ public class SamplingLoop extends Thread {
 
     public void finish() {
         isRunning = false;
-        interrupt();
+//        interrupt();
+        Log.e("Sampling Loop", "finish");
     }
 }
