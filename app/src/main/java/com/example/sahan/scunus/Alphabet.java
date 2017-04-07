@@ -1,10 +1,13 @@
 package com.example.sahan.scunus;
 
 
+import android.util.SparseArray;
+
 import java.util.HashMap;
 
 public class Alphabet {
     private final HashMap<String, Double> hmap = new HashMap<>();
+    private final SparseArray<Character> binmap = new SparseArray<>();
 
     public Alphabet (){
         hmap.put("START", 18002.0);
@@ -25,9 +28,22 @@ public class Alphabet {
         hmap.put("e", 18648.0);
         hmap.put("f", 18691.0);
         hmap.put("END", 18734.0);
+
+        // 48 ASCII is '0', 57 is '9'
+        int j = Constants.START_TONE_BIN + 1; // +1 First symbol is == start+1
+        for(int i = 48; i<= 57; i++){
+            binmap.put( j++ , (char) i);
+        }
+
+        // 97 is 'a' and 102 is 'f'
+        for(int i = 97; i<= 102; i++){
+            binmap.put( j++ , (char) i);
+        }
     }
 
     public HashMap getAlphabet(){
         return hmap;
     }
+
+    public SparseArray getBinMap(){ return binmap;}
 }

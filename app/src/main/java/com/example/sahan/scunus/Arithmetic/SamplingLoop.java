@@ -80,7 +80,6 @@ public class SamplingLoop extends Thread {
                         AudioFormat.ENCODING_PCM_16BIT, BYTE_OF_SAMPLE * bufferSampleSize);
         } catch (IllegalArgumentException e) {
             Log.e(TAG, "Fail to initialize recorder.");
-//            activity.analyzerViews.notifyToast("Illegal recorder argument. (change source)");
             return;
         }
         Log.i(TAG, "com.example.sahan.scunus.Arithmetic.SamplingLoop::Run(): Starting recorder... \n" +
@@ -175,8 +174,9 @@ public class SamplingLoop extends Thread {
         record.stop();
         record.release();
         Log.e("ScunusCount", String.valueOf(scunusCounter));
-//        Demodulator demodulator = new Demodulator();
-//        demodulator.demodulate(signalBins);
+
+        Demodulator demodulator = new Demodulator();
+        demodulator.demodulate(signalBins);
 
     }
 
