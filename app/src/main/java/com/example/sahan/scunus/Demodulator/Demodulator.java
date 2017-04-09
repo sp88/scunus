@@ -60,7 +60,7 @@ public class Demodulator {
                 if (prevTone != bin && prevTone != 0) {
                     // if not same tone
                     // if enough bins are present add to list
-                    if(count >= 1){
+                    if(count >= 2){
                         sb.append(binMap.get(prevTone));
                     }
                     count = 1;
