@@ -176,7 +176,15 @@ public class SamplingLoop extends Thread {
         Log.e("ScunusCount", String.valueOf(scunusCounter));
 
         Demodulator demodulator = new Demodulator();
-        demodulator.demodulate(signalBins);
+        final String msg = demodulator.demodulate(signalBins);
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TextView msgTextView = (TextView) activity.findViewById(R.id.msgTextView);
+                msgTextView.setText(msg);
+            }
+        }); // END - runOnUiThread
 
     }
 
