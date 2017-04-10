@@ -4,6 +4,7 @@ package com.example.sahan.scunus.Generator;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.util.Log;
 
 import com.example.sahan.scunus.Constants;
 
@@ -34,12 +35,13 @@ public class SoundGenerator extends Thread {
     private AudioTrack audioTrack;
     private void playSound(byte[] generatedSnd){
         try {
+            Thread.sleep(500);
             audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
                     Constants.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO,
                     AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length,
                     AudioTrack.MODE_STREAM);
-        } catch (IllegalStateException ie){
-            ie.printStackTrace();
+        } catch (IllegalStateException | InterruptedException ie){
+            Log.e("SoundGenerator", ie.getMessage());
             return;
         }
         audioTrack.write(generatedSnd, 0, generatedSnd.length);
