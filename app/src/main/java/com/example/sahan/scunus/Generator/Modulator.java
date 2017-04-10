@@ -18,7 +18,7 @@ import java.util.zip.Inflater;
 public class Modulator {
 
     private double startEndToneDuration = 0.5;  // seconds
-    private double dataToneDuration =  0.046; // seconds
+    private double dataToneDuration =  0.069; // seconds
     private byte generatedSnd[];
     private int sampleRate = Constants.SAMPLE_RATE;
     private int idx = 0;

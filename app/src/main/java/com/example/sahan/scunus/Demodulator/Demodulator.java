@@ -48,9 +48,9 @@ public class Demodulator {
             for (int bin : signalList) {
                 if (bin > Constants.START_TONE_BIN && bin < Constants.END_TONE_BIN) {
                     // if same tone and the count is less than 4 (0.0115 * 4 = 0.046 MAX)
-                    if(prevTone == bin && count < 4){
+                    if(prevTone == bin && count < 6){
                         count++;
-                    } else if (prevTone == bin && count == 4){
+                    } else if (prevTone == bin && count == 6){
                         // if enough bins are present add to list
                         sb.append(binMap.get(bin));
                         count = 1;
