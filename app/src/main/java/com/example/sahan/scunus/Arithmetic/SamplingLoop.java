@@ -25,7 +25,13 @@ import android.widget.TextView;
 import com.example.sahan.scunus.Constants;
 import com.example.sahan.scunus.Demodulator.Demodulator;
 import com.example.sahan.scunus.R;
+import com.example.sahan.scunus.reedsolomon.EncoderDecoder;
+import com.example.sahan.scunus.reedsolomon.ReedSolomonException;
+import com.example.sahan.scunus.reedsolomon.Util;
 
+import java.security.Provider;
+import java.security.Security;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -68,16 +74,17 @@ public class SamplingLoop extends Thread {
         // Determine size of buffers for AudioRecord and AudioRecord::read()
         int readChunkSize    = Constants.FFT_LENGTH/2;  // /2 due to overlapped analyze window
         readChunkSize        = Math.min(readChunkSize, 2048);  // read in a smaller chunk, hopefully smaller delay
-        int bufferSampleSize = Math.max(minBytes / BYTE_OF_SAMPLE, Constants.FFT_LENGTH/2) * 2;
+//        int bufferSampleSize = Math.max(minBytes / BYTE_OF_SAMPLE, Constants.FFT_LENGTH/2) * 2;
         // tolerate up to about 1 sec.
-        bufferSampleSize = (int)Math.ceil(1.0 * Constants.SAMPLE_RATE / bufferSampleSize) * bufferSampleSize;
+//        bufferSampleSize = (int)Math.ceil(1.0 * Constants.SAMPLE_RATE / bufferSampleSize) * bufferSampleSize;
+        int bufferSize = AudioRecord.getMinBufferSize(Constants.SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
         // Use the mic with AGC turned off. e.g. VOICE_RECOGNITION for measurement
         // The buffer size here seems not relate to the delay.
         // So choose a larger size (~1sec) so that overrun is unlikely.
         try {
             record = new AudioRecord(RECORDER_AGC_OFF, Constants.SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
-                        AudioFormat.ENCODING_PCM_16BIT, BYTE_OF_SAMPLE * bufferSampleSize);
+                        AudioFormat.ENCODING_PCM_16BIT, /*BYTE_OF_SAMPLE * bufferSampleSize*/ bufferSize);
         } catch (IllegalArgumentException e) {
             Log.e(TAG, "Fail to initialize recorder.");
             return;
@@ -86,7 +93,7 @@ public class SamplingLoop extends Thread {
                 "  source          : " + /*analyzerParam.getAudioSourceName() +*/ "\n" +
                 String.format("  sample rate     : %d Hz (request %d Hz)\n", record.getSampleRate(), Constants.SAMPLE_RATE) +
                 String.format("  min buffer size : %d samples, %d Bytes\n", minBytes / BYTE_OF_SAMPLE, minBytes) +
-                String.format("  buffer size     : %d samples, %d Bytes\n", bufferSampleSize, BYTE_OF_SAMPLE*bufferSampleSize) +
+                String.format("  buffer size     : %d samples, %d Bytes\n", bufferSize, BYTE_OF_SAMPLE*bufferSize) +
                 String.format("  read chunk size : %d samples, %d Bytes\n", readChunkSize, BYTE_OF_SAMPLE*readChunkSize) +
                 String.format("  FFT length      : %d\n", Constants.FFT_LENGTH) +
                 String.format("  nFFTAverage     : %d\n", Constants.N_FFT_AVERAGE));
@@ -178,6 +185,37 @@ public class SamplingLoop extends Thread {
         Demodulator demodulator = new Demodulator();
         final String msg = demodulator.demodulate(signalBins);
 
+//        EncoderDecoder encoderDecoder = new EncoderDecoder();
+//
+//        try {
+
+//            String message = "Name";
+//
+//            byte[] data = message.getBytes();
+//
+//            byte[] encodedData = encoderDecoder.encodeData(data, 5);
+//
+//            Log.e("FEC",String.format("Message: %s", Util.toHex(data)));
+//            Log.e("FEC",String.format("Encoded Message: %s", Util.toHex(encodedData)));
+//
+//            // Intentionally screw up the first 2 bytes
+//            encodedData[0] = (byte) (Integer.MAX_VALUE & 0xFF);
+//            encodedData[1] = (byte)(Integer.MAX_VALUE & 0xFF);
+//            encodedData[encodedData.length -1] = (byte)(Integer.MAX_VALUE & 0xFF);
+//
+//            Log.e("FEC",String.format("Flawed Encoded Message: %s", Util.toHex(encodedData)));
+
+//            byte[] decodedData = encoderDecoder.decodeData(_msg.getBytes(), 5);
+//            final String msg = Util.toHex(encodedData);
+//
+//            Log.e("FEC",String.format("Decoded/Repaired Message: %s", Util.toHex(decodedData)));
+//
+//        } catch (EncoderDecoder.DataTooLargeException e) {
+//            Log.e("FEC","DataTooLargeException");
+//        } catch (ReedSolomonException e) {
+//            Log.e("FEC","ReedSolomonException");
+//        }
+
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -185,6 +223,21 @@ public class SamplingLoop extends Thread {
                 msgTextView.setText(msg);
             }
         }); // END - runOnUiThread
+
+//        for (Provider provider : Security.getProviders()) {
+//            Log.e("Provider", String.format("\n----\nProvider: %s", provider.getName()));
+//
+//            final Iterator<Object> i = provider.keySet().iterator();
+//            while (i.hasNext()) {
+//
+//                String entry = (String) i.next();
+//                Log.e("keyset", String.format("\n%s \t %s", entry,
+//                                    provider.getProperty(entry))
+//                );
+//            }
+//        }
+
+
 
     }
 
