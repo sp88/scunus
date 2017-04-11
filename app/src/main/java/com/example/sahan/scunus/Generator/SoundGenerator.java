@@ -35,7 +35,7 @@ public class SoundGenerator extends Thread {
     private AudioTrack audioTrack;
     private void playSound(byte[] generatedSnd){
         try {
-            Thread.sleep(500);
+            Thread.sleep(1000);
             audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
                     Constants.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO,
                     AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length,
