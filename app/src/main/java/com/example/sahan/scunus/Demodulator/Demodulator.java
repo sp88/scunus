@@ -1,6 +1,8 @@
 package com.example.sahan.scunus.Demodulator;
 
 
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -19,6 +21,7 @@ public class Demodulator {
     public String demodulate(List<Integer> signalList){
         if(signalList.size() == 0){
             Log.e("demodulate", "Signal Bins == 0");
+            errorTone();
             return "Try Again";
         }
         if(signalList.get(0) == Constants.START_TONE_BIN &&
@@ -83,6 +86,7 @@ public class Demodulator {
                 return msg;
             } catch (DecoderException e) {
                 Log.e("Hex Decode", "DecoderException");
+                errorTone();
                 return "Try Again";
             }
 
@@ -98,8 +102,14 @@ public class Demodulator {
 
         } else {
             Log.e("demodulate", "Record does not contain START AND END tones!");
+            errorTone();
         }
 
         return "Try Again";
+    }
+
+    private void errorTone(){
+        ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME);
+        toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,300);
     }
 }
