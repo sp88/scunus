@@ -38,4 +38,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile project(path: ':FFTLibrary')
     compile files('libs/commons-codec-1.10.jar')
+    compile files('libs/ecdh-curve25519.jar')
 }
