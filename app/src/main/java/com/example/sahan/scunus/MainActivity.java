@@ -10,21 +10,11 @@ import android.widget.TextView;
 
 import com.example.sahan.scunus.reedsolomon.Util;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import de.frank_durr.ecdh_curve25519.ECDHCurve25519;
@@ -33,7 +23,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // Used to load the 'native-lib' library on application startup.
     static {
-//        System.loadLibrary("native-lib");
         System.loadLibrary("ecdhcurve25519");
     }
 
@@ -121,9 +110,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          /**  **/
 
         // Original text
-        String theTestText = "sahan cake hmm";
+        String theTestText = "Name";
 
-        // Set up secret key spec for 128-bit AES encryption and decryption
+        // Set up secret key spec for 256-bit AES encryption and decryption
         SecretKeySpec sks = null;
         try {
             SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
@@ -131,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             KeyGenerator kg = KeyGenerator.getInstance("AES");
 //            kg.init(128, sr);
             kg.init(256, sr);
-//            sks = new SecretKeySpec((kg.generateKey()).getEncoded(), "AES");
             sks = new SecretKeySpec((kg.generateKey()).getEncoded(), "AES");
         } catch (Exception e) {
             Log.e("Set up Secret", "AES secret key spec error");
@@ -143,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Cipher c = Cipher.getInstance("AES");
             c.init(Cipher.ENCRYPT_MODE, sks);
             encodedBytes = c.doFinal(theTestText.getBytes());
+            Log.e("Encode", Util.toHex(encodedBytes));
         } catch (Exception e) {
             Log.e("Encode Exception", "AES encryption error");
         }
@@ -159,7 +148,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.e("Decode", new String(decodedBytes, StandardCharsets.UTF_8));
         } catch (Exception e) {
             Log.e("Decode Exception", "AES decryption error");
-
         }
 
     }
